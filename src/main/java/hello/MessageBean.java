@@ -29,7 +29,7 @@ public class MessageBean implements Serializable {
         switch (value){
             case "":
             case "pt":
-                msg = "Alô";
+                msg = "Alôhasiahsiahs";
                 break;
             case "en":
                 msg = "Hello";
