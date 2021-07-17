@@ -5,6 +5,7 @@
  */
 package hello;
 
+import static hello.MessageBean.cumprimento;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Maycon Prata
+ * @author Leonardo Thimoteo
  */
 @WebServlet("/alomundo")
 public class HelloServlet extends HttpServlet {
@@ -108,6 +109,7 @@ public class HelloServlet extends HttpServlet {
         
         int idade = 0;
         int horario = getHoraAtual();
+        String faixa_etaria = ""; 
         
         msg = getLingua(request, msg);
         
@@ -118,10 +120,18 @@ public class HelloServlet extends HttpServlet {
         try {
 			idade = qualEMinhaIdade(request, local);
 		} catch (Exception e) {
-			throw new RuntimeException("Data não informada, você deve informar a data!!!");
+			throw new RuntimeException("Data não informada, por favor, informe a Data");
 		}
         
         response.setContentType("text/html;charset=UTF-8");
+        
+        idade = qualEMinhaIdade(request, local);
+        
+        if(idade > 25)
+            faixa_etaria = "cringe";
+        else 
+            faixa_etaria = "milenium";
+                
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
@@ -133,7 +143,7 @@ public class HelloServlet extends HttpServlet {
             out.println("<h1>Servlet HelloServlet</h1>");
             out.println("<p>" + msg + "</p>");
             out.println("<p>" + Cumprimento.getCumprimento() + "</p>");
-            out.println("<p>Minha idade é " + idade +" anos</p>");
+            out.println("<p>Você se encaixa em " + faixa_etaria +"</p>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -175,13 +185,13 @@ public class HelloServlet extends HttpServlet {
                 msg = "Hallo, ";
                 cumprimento = new Cumprimento("Guten morgen", "Guten tag", "Gute nacht");
                 break;
-            case "es":
-            	msg = "Hola, ";
-            	cumprimento = new Cumprimento("Buen día", "Buenas tardes", "Buenas noches");
+            case "nl":
+            	msg = "Hoi, ";
+            	cumprimento = new Cumprimento("Goedemorgen", "Goedenmiddag", "Welterusten");
             	break;
-            case "it":
-            	msg = "Ciao, ";
-            	cumprimento = new Cumprimento("Buongiorno", "Buon pomeriggio", "Buona Notte");
+            case "ru":
+            	msg = "Привет, ";
+            	cumprimento = new Cumprimento("Доброе утро", "Добрый день", "спокойной ночи");
                 break;
         }
 		return msg;

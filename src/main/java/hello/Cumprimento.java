@@ -2,7 +2,7 @@ package hello;
 
 /**
 *
-* @author Maycon Prata
+* @author Leonardo Thimoteo
 */
 public class Cumprimento {
 

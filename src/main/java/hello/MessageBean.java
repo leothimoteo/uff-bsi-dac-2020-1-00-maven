@@ -51,13 +51,13 @@ public class MessageBean implements Serializable {
                 msg = "Hallo, ";
                 cumprimento = new Cumprimento("Guten morgen", "Guten tag", "Gute nacht");
                 break;
-            case "es":
-            	msg = "Hola, ";
-            	cumprimento = new Cumprimento("Buen día", "Buenas tardes", "Buenas noches");
+            case "nl":
+            	msg = "Hoi, ";
+            	cumprimento = new Cumprimento("Goedemorgen", "Goedenmiddag", "Welterusten");
             	break;
-            case "it":
-            	msg = "Ciao, ";
-            	cumprimento = new Cumprimento("Buongiorno", "Buon pomeriggio", "Buona Notte");
+            case "ru":
+            	msg = "Привет, ";
+            	cumprimento = new Cumprimento("Доброе утро", "Добрый день", "спокойной ночи");
                 break;
         }
     }
