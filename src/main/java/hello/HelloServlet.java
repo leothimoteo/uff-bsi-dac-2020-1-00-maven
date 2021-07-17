@@ -7,6 +7,11 @@ package hello;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,10 +20,13 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author viter
+ * @author Maycon Prata
  */
 @WebServlet("/alomundo")
 public class HelloServlet extends HttpServlet {
+	
+	static Cumprimento cumprimento;
+	static LocalDateTime local;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -60,28 +68,13 @@ public class HelloServlet extends HttpServlet {
             throws ServletException, IOException {
         
         String msg = "";
+        int horario = getHoraAtual();
         
-        String lang = request.getParameter("lang");
-        if(lang==null)
-            lang = "pt";
-        switch(lang){
-            case "pt":
-                msg = "Alô, ";
-                break;
-            case "en":
-                msg = "Hello, ";
-                break;
-            case "fr":
-                msg = "Bonjour, ";
-                break;
-        }
+        msg = getLingua(request, msg);
         
-        String nome = request.getParameter("nome");
-
-        if(nome==null)
-            nome = "Fulano";
+        msg = getNome(request, msg);
         
-        msg = msg+nome+"!";
+        Cumprimento.setHorario(horario);
 
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
@@ -94,6 +87,7 @@ public class HelloServlet extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet HelloServlet</h1>");
             out.println("<p>" + msg + "</p>");
+            out.println("<p>" + Cumprimento.getCumprimento() + "</p>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -112,31 +106,21 @@ public class HelloServlet extends HttpServlet {
             throws ServletException, IOException {
         String msg = "";
         
-        String lang = request.getParameter("lang");
-        if(lang==null)
-            lang = "pt";
-        switch(lang){
-            case "pt":
-                msg = "Alô, ";
-                break;
-            case "en":
-                msg = "Hello, ";
-                break;
-            case "fr":
-                msg = "Bonjour, ";
-                break;
-            case "de":
-                msg = "Hallo, ";
-                break;
-        }
+        int idade = 0;
+        int horario = getHoraAtual();
         
-        String nome = request.getParameter("nome");
-
-        if(nome==null)
-            nome = "Fulano";
+        msg = getLingua(request, msg);
         
-        msg = msg+nome+"!";
-
+        msg = getNome(request, msg);
+        
+        Cumprimento.setHorario(horario);
+        
+        try {
+			idade = qualEMinhaIdade(request, local);
+		} catch (Exception e) {
+			throw new RuntimeException("Data não informada, você deve informar a data!!!");
+		}
+        
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
@@ -148,10 +132,101 @@ public class HelloServlet extends HttpServlet {
             out.println("<body>");
             out.println("<h1>Servlet HelloServlet</h1>");
             out.println("<p>" + msg + "</p>");
+            out.println("<p>" + Cumprimento.getCumprimento() + "</p>");
+            out.println("<p>Minha idade é " + idade +" anos</p>");
             out.println("</body>");
             out.println("</html>");
         }
     }
+
+    /**
+     * Retorna a hora atual
+     * @return hora atual
+     */
+	public int getHoraAtual() {
+		local = LocalDateTime.now();
+		return local.getHour();
+	}
+
+    /**
+     * Com base na escolha do usuário seleciona uma lingua
+     * @param request
+     * @param msg
+     * @return lingua
+     */
+	private String getLingua(HttpServletRequest request, String msg) {
+		String lang = request.getParameter("lang");
+        if(lang==null)
+            lang = "pt";
+        switch(lang){
+            case "pt":
+                msg = "Alô, ";
+                cumprimento = new Cumprimento("Bom dia", "Boa tarde", "Boa noite");
+                break;
+            case "en":
+                msg = "Hello, ";
+                cumprimento = new Cumprimento("Good morning", "Good afternoon", "Good night");
+                break;
+            case "fr":
+                msg = "Bonjour, ";
+                cumprimento = new Cumprimento(msg, "Bon après-midi", "Bonne nuit");
+                break;
+            case "de":
+                msg = "Hallo, ";
+                cumprimento = new Cumprimento("Guten morgen", "Guten tag", "Gute nacht");
+                break;
+            case "es":
+            	msg = "Hola, ";
+            	cumprimento = new Cumprimento("Buen día", "Buenas tardes", "Buenas noches");
+            	break;
+            case "it":
+            	msg = "Ciao, ";
+            	cumprimento = new Cumprimento("Buongiorno", "Buon pomeriggio", "Buona Notte");
+                break;
+        }
+		return msg;
+	}
+
+    /**
+     * Com base no input de Texto fornecido pelo usuário retorna o nome  
+     * @param request
+     * @param msg
+     * @return nome
+     */
+	private String getNome(HttpServletRequest request, String msg) {
+		String nome = request.getParameter("nome");
+        
+        if(nome==null)
+            nome = "Fulano";
+        
+        msg = msg+nome+"!";
+		return msg;
+	}
+
+    /**
+     * Com base no input Data fornecido pelo usuário retorna o aniversário 
+     * @param request
+     * @param local
+     * @return idade
+     * @throws Exception 
+     */
+	private int qualEMinhaIdade(HttpServletRequest request, LocalDateTime local) throws Exception {
+		int ano;
+		int idade;
+		SimpleDateFormat in = new SimpleDateFormat("yyyy-MM-dd");
+        String parameter = request.getParameter("data");
+            
+        Date date = null;
+		try {
+			date = in.parse(parameter);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+
+		ano = date.getYear() + 1900;
+		idade = local.getYear() - ano;
+		return idade;
+	}
 
     /**
      * Returns a short description of the servlet.
